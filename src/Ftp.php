@@ -1,6 +1,8 @@
 <?php
 
-class Ftp
+include "interfaces/FtpInterface.php";
+
+class Ftp implements FtpInterface
 {
 	private $conn;
 
@@ -21,18 +23,28 @@ class Ftp
 		return ftp_close($this->conn);
 	}
 
+	public function download($remote, $local, $mode = FTP_BINARY)
+	{
+		return ftp_get($this->conn, $remote, $local, $mode);
+	}
+
+	public function list($dir)
+	{
+		return ftp_nlist($this->conn, $dir);
+	}
+
 	public function login($user, $pass)
 	{
 		return ftp_login($this->conn, $user, $pass);
 	}
 
-	public function nlist($dir)
-	{
-		return ftp_nlist($this->conn, $dir);
-	}
-
 	public function pasv($bool)
 	{
 		return ftp_pasv($this->conn, $bool);
+	}
+
+	public function upload($remote, $local, $mode = FTP_BINARY)
+	{
+		return ftp_put($this->conn, $remote, $local, $mode);
 	}
 }
