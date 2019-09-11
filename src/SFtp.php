@@ -10,7 +10,7 @@ class SFtp implements FtpInterface
 		$host,
 		$port = 22
 	) {
-		$this->conn = ssh2_connect($host, $port);
+		$this->conn = @ssh2_connect($host, $port);
 
 		if (!$this->conn) throw new \Exception("Could not connect to $host on port $port.");
 	}
