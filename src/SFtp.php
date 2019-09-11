@@ -1,7 +1,5 @@
 <?php
 
-include "interfaces/FtpInterface.php";
-
 class SFtp implements FtpInterface
 {
 	private $conn;
@@ -12,22 +10,21 @@ class SFtp implements FtpInterface
 		$host,
 		$port = 22
 	) {
-		$this->conn = @ssh2_connect($host, $port);
+		$this->conn = ssh2_connect($host, $port);
 
 		if (!$this->conn) throw new \Exception("Could not connect to $host on port $port.");
 	}
 
-	public function chdir($dir)
-	{
-	}
+	public function chdir($dir) {}
 
 	public function close()
 	{
+		return @ssh2_disconnect($this->conn);
 	}
 
 	public function download($remote, $local)
 	{
-		$remote_stream = @fopen("ssh2.sftp://{$this->sftp}{$remote}", "r");
+		$remote_stream = @fopen("ssh2.sftp://{$this->sftp}/{$remote}", "r");
 		$local_stream = @fopen($local, "w");
 
 		if (!$remote_stream)
@@ -54,17 +51,30 @@ class SFtp implements FtpInterface
 
 		if (!$this->sftp)
 			throw new \Exception("Could not initialize SFTP subsystem.");
+		else
+			return true;
 	}
 
 	public function list($dir)
 	{
-	}
+		$handle = opendir("ssh2.sftp://{$this->sftp}/{$dir}");
 
-	public function pasv($bool) {}
+		$files = [];
+
+		while ($file = readdir($handle)) {
+			if ($file !== "." && $file !== "..") {
+				$files[] = $file;
+			}
+		}
+
+		closedir($handle);
+
+		return $files;
+	}
 
 	public function upload($remote, $local)
 	{
-		$stream = @fopen("ssh2.sftp://{$this->sftp}{$remote}", "w");
+		$stream = @fopen("ssh2.sftp://{$this->sftp}/{$remote}", "w");
 
 		if (!$stream)
 			throw new \Exception("Could not open file: {$remote}");

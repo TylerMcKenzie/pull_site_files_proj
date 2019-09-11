@@ -1,7 +1,5 @@
 <?php
 
-include "interfaces/FtpInterface.php";
-
 class Ftp implements FtpInterface
 {
 	private $conn;
@@ -11,6 +9,8 @@ class Ftp implements FtpInterface
 		$port = 21
 	) {
 		$this->conn = ftp_connect($host, $port);
+
+		if (!$this->conn) throw new \Exception("Could not connect to $host on port $port.");
 	}
 
 	public function chdir($dir)

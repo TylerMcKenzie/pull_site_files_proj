@@ -12,7 +12,5 @@ interface FtpInterface
 
 	public function list($directory);
 
-	public function pasv($bool);
-
 	public function upload($remote, $local);
 }
